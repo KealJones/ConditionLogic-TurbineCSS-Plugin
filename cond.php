@@ -13,18 +13,18 @@
  * @param mixed &$parsed
  * @return void
  */
-function if(&$parsed)
+function cond(&$parsed)
 {
     global $cssp, $browser;
     foreach ($parsed as $block => $css) {
         foreach ($parsed[$block] as $selector => $styles) {
             foreach ($styles as $property => $values) {
-                if (strpos($values, 'if(') !== false) {
+                if (strpos($values, 'cond(') !== false) {
                     /**
                      * Clean up variable names and Formatting.
                      */
                     
-                    $var = get_string_between($var, "if(", ")");
+                    $var = get_string_between($var, "cond(", ")");
                     
                     $ifParams = explode(",", $var);
                     
@@ -121,5 +121,4 @@ function get_string_between($string, $start, $end)
 /**
  * Register the plugin
  */
-$cssp->register_plugin('if', 'if', 'before_glue', 0);
-?>
+$cssp->register_plugin('cond', 'cond', 'before_glue', 0);
