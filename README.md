@@ -7,6 +7,9 @@ This can be used for alot of potential use cases.
 ex. Testing if its a holiday, changes the logo path in your css.
 
 # Use:
+As the value of any css property use: `cond(condition,true,false)`
+
+Ex.
 ```
 @turbine
     plugins:cond
