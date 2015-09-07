@@ -19,24 +19,21 @@ function cond(&$parsed)
     foreach ($parsed as $block => $css) {
         foreach ($parsed[$block] as $selector => $styles) {
             foreach ($styles as $property => $values) {
-                if (strpos($values, 'cond(') !== false) {
+                if (strpos($values[0], 'cond(') !== false) {
                     /**
                      * Clean up variable names and Formatting.
                      */
-                    
-                    $var = get_string_between($var, "cond(", ")");
-                    
-                    $ifParams = explode(",", $var);
-                    
+                    $condition = get_string_between($values[0], "cond(", ")");
+                    $ifParams  = explode(",", $condition);
                     $ifCond    = explode(" ", $ifParams[0]);
-                    $ifCond[0] = parse($ifCond[0]);
-                    //echo $ifCond[0];
+                    $ifCond[0] = interp($ifCond[0]); //Convert PHP string to Values
+                    $ifCond[2] = interp($ifCond[2]); //Convert PHP string to Values
                     $test      = compare($ifCond[0], $ifCond[1], $ifCond[2]);
-                    
+                    $parsed[$block][$selector][$property]   = ''; //Remove existing Cond Statement
                     if ($test) {
-                        echo $ifParams[1];
+                        $parsed[$block][$selector][$property][] = $ifParams[1]; //Place True Value
                     } else {
-                        echo $ifParams[2];
+                        $parsed[$block][$selector][$property][] = $ifParams[2]; //Place False Value
                     }
                 }
             }
@@ -47,10 +44,10 @@ function cond(&$parsed)
 /**
  * Utility Functions
  */
-function parse($phpString)
+function interp($phpString)
 {
     /**
-     * Find alternate methody than eval, Maybe something like compare function, would limit full potential though.
+     * Find alternate method than eval, Maybe something like compare function, would limit full potential though.
      * Has very high chance for hacking by modifying cache of cssp file.
      */
     return eval("return( " . $phpString . ");");
@@ -58,49 +55,39 @@ function parse($phpString)
 function compare($value1, $op, $value2)
 {
     $known_ops = array(
-        '==' => function($a, $b)
+        "==" => function($a, $b)
         {
             return $a == $b;
         },
-        '===' => function($a, $b)
+        "===" => function($a, $b)
         {
             return "$a" === "$b";
         },
-        '!=' => function($a, $b)
+        "!=" => function($a, $b)
         {
             return $a != $b;
         },
-        '<>' => function($a, $b)
-        {
-            return $a <> $b;
+        '<>' => function($a, $b){
+        return ($a <> $b);
         },
-        '!==' => function($a, $b)
-        {
-            return $a !== $b;
+        '!==' => function($a, $b){
+        return ($a !== $b);
         },
         '<' => function($a, $b)
         {
-            return $a < $b;
+        return $a < $b;
         },
         '>' => function($a, $b)
         {
-            return $a > $b;
+        return $a > $b;
         },
         '<=' => function($a, $b)
         {
-            return $a <= $b;
+        return $a <= $b;
         },
         '>=' => function($a, $b)
         {
-            return $a >= $b;
-        },
-        '<=>' => function($a, $b)
-        {
-            return $a <=> $b;
-        },
-        '??' => function($a, $b)
-        {
-            return $a ?? $b;
+        return $a >= $b;
         }
     );
     $func      = $known_ops[$op];
@@ -122,3 +109,5 @@ function get_string_between($string, $start, $end)
  * Register the plugin
  */
 $cssp->register_plugin('cond', 'cond', 'before_glue', 0);
+
+?>
