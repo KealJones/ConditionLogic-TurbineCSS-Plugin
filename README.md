@@ -18,7 +18,7 @@ Ex.
     sundayColor:#C02222
 
 #foo
-    color:cond(date('j') == 7,$sundayColor,#fff)
+    color:cond(date('N') == 7,$sundayColor,#fff)
 ```
 
 # Todo:
