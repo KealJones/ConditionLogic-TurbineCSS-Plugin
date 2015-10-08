@@ -24,16 +24,17 @@ function cond(&$parsed)
                      * Clean up variable names and Formatting.
                      */
                     $condition = get_string_between($values[0], "cond(", ")");
-                    $ifParams  = explode(",", $condition);
+                    $ifParams  = explode("?", $condition);
+                    $ifResults = explode(":", $ifParams[1]); 
                     $ifCond    = explode(" ", $ifParams[0]);
                     $ifCond[0] = interp($ifCond[0]); //Convert PHP string to Values
                     $ifCond[2] = interp($ifCond[2]); //Convert PHP string to Values
                     $test      = compare($ifCond[0], $ifCond[1], $ifCond[2]);
                     $parsed[$block][$selector][$property]   = ''; //Remove existing Cond Statement
                     if ($test) {
-                        $parsed[$block][$selector][$property][] = $ifParams[1]; //Place True Value
+                        $parsed[$block][$selector][$property][] = $ifResults[0]; //Place True Value
                     } else {
-                        $parsed[$block][$selector][$property][] = $ifParams[2]; //Place False Value
+                        $parsed[$block][$selector][$property][] = $ifResults[1]; //Place False Value
                     }
                 }
             }
